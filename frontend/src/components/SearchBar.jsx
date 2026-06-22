@@ -3,6 +3,12 @@ import { FaMagnifyingGlass } from "react-icons/fa6"
 import { IoMdClose } from "react-icons/io"
 
 const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className='w-full flex items-center px-4 bg-slate-100 rounded-md'>
       <input
@@ -11,6 +17,7 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
         className='w-full text-xs bg-transparent py-[11px] outline-none'
         value={value}
         onChange={onChange}
+        onKeyPress={handleKeyPress}
       />
 
       {value && (

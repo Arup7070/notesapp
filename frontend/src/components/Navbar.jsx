@@ -14,16 +14,16 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
         navigate("/login");
     }
 
-    const handleSearch = () => {
-        if (searchQuery) {
-            onSearchNote(searchQuery);
-        }
-    };
-
     const onClearSearch = () => {
         setSearchQuery("");
         handleClearSearch();
     }
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            onSearchNote(searchQuery.trim());
+        }
+    };
 
     return (
         <div className="bg-white flex flex-col px-4 sm:px-6 py-3 drop-shadow gap-3">
