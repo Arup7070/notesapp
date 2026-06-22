@@ -7,6 +7,7 @@ import userRoutes from "./routes/user.route.js";
 import notesRoutes from "./routes/notes.route.js";
 import healthRoutes from "./routes/health.route.js";
 import path from "path";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,15 +41,27 @@ app.use("/api/health/", healthRoutes);
 
 
 const PORT = process.env.PORT || 5000
-const frontendDistPath = path.join(__dirname, "..", "frontend", "dist");
+let frontendDistPath = path.join(__dirname, "..", "frontend", "dist");
 
- 
-if(process.env.NODE_ENV === "production"){
-    app.use(express.static(frontendDistPath));
+// Fallbacks for different deployment layouts
+if (!fs.existsSync(frontendDistPath)) {
+    const alt1 = path.join(process.cwd(), "frontend", "dist");
+    const alt2 = path.join(process.cwd(), "dist");
+    if (fs.existsSync(alt1)) frontendDistPath = alt1;
+    else if (fs.existsSync(alt2)) frontendDistPath = alt2;
+}
 
-    app.get("*", (req,res) =>{
-        res.sendFile(path.join(frontendDistPath, "index.html"));
-    })
+if (process.env.NODE_ENV === "production") {
+    if (fs.existsSync(frontendDistPath)) {
+        app.use(express.static(frontendDistPath));
+
+        app.get("*", (req, res) => {
+            res.sendFile(path.join(frontendDistPath, "index.html"));
+        });
+        console.log(`Serving static files from ${frontendDistPath}`);
+    } else {
+        console.warn("Warning: frontend dist not found at expected paths. Static assets won't be served.");
+    }
 }
 
 await connect_db();
