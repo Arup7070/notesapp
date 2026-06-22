@@ -25,6 +25,12 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
         }
     };
 
+    const handleInputChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        onSearchNote(query);
+    };
+
     return (
         <div className="bg-white flex flex-col px-4 sm:px-6 py-3 drop-shadow gap-3">
             <div className="w-full flex items-center justify-between gap-3">
@@ -47,7 +53,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
                 <div className="w-full">
                     <SearchBar
                         value={searchQuery}
-                        onChange={({ target }) => setSearchQuery(target.value)}
+                        onChange={handleInputChange}
                         handleSearch={handleSearch}
                         onClearSearch={onClearSearch}
                     />
