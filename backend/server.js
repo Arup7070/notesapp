@@ -21,8 +21,9 @@ app.use(express.json());
 const allowedOrigins = [
     "http://localhost:5173",
     "https://notesapp0-41mg.onrender.com",
-    "https://notesapp-jwro.onrender.com/",
-];
+    "https://notesapp-jwro.onrender.com",
+    process.env.FRONTEND_URL,
+].filter(Boolean);
 
 app.use(cors({
     origin: (origin, callback) => {
