@@ -66,8 +66,40 @@ if (process.env.NODE_ENV === "production") {
 }
 
 await connect_db();
+// Start server and handle bind errors (EADDRINUSE) gracefully
+const server = app.listen(PORT, () => {
+    console.log(`Server started at http://localhost:${PORT}`);
+});
 
-app.listen(PORT,()=>{
-    console.log("Server started at http://localhost:" + PORT); 
+server.on("error", (err) => {
+    if (err && err.code === 'EADDRINUSE') {
+        console.error(`\nERROR: Port ${PORT} is already in use.`);
+        console.error("Either stop the process using this port or set a different PORT in your environment.");
+        console.error("On Windows: run `netstat -ano | findstr :" + PORT + "` to find the PID, then `taskkill /PID <pid> /F`.");
+        console.error("On PowerShell: `Get-NetTCPConnection -LocalPort " + PORT + " | Select-Object -ExpandProperty OwningProcess` then `Stop-Process -Id <pid> -Force`");
+        console.error("On macOS / Linux: `lsof -i :" + PORT + "` then `kill -9 <pid>`\n");
+    } else {
+        console.error("Server error:", err);
+    }
+    process.exit(1);
+});
+
+// Graceful shutdown handlers
+process.on('SIGINT', () => {
+    console.log('SIGINT received — shutting down server');
+    server.close(() => process.exit(0));
+});
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received — shutting down server');
+    server.close(() => process.exit(0));
+});
+
+// Helpful handlers for uncaught errors/promises
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
 });
  
